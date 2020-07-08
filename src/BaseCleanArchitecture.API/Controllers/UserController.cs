@@ -44,9 +44,9 @@ namespace BaseCleanArchitecture.API.Controllers
                 Email = registerUser.Email
             };
 
-            var ceratedUser = await _user.Create(user);
+            var createdUser = await _user.Create(user);
 
-            return Ok(ceratedUser);
+            return Ok(createdUser);
         }
 
         [HttpPut("edit-user")]

@@ -1,8 +1,12 @@
+using BaseCleanArchitecture.API.Filters;
 using BaseCleanArchitecture.Core.Interfaces;
+using BaseCleanArchitecture.Infra.Log;
 using BaseCleanArchitecture.Core.Shared.Interfaces;
 using BaseCleanArchitecture.Infra.Data;
 using BaseCleanArchitecture.UseCases;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,19 +28,28 @@ namespace BaseCleanArchitecture.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var strConn = System.Environment.GetEnvironmentVariable("AppConnection");
-            if (strConn == null) { strConn = Configuration.GetConnectionString("AppConnection"); }
-
+            var strConn = System.Environment.GetEnvironmentVariable("AppConnection") ?? Configuration.GetConnectionString("AppConnection");
             services.AddDbContext<AppContext>(options => options.UseSqlServer(strConn));
 
             services.AddScoped<IRepository, AppRepository>();
+            services.AddSingleton<IScopeInformation, ScopeInformation>();
             services.AddScoped<IUser, UserUseCase>();
 
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BaseCleanArchitecture API's", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Base Clean Architecture API", Version = "v1" });
+            });
+
+            services.AddHealthChecks()
+                .AddSqlServer(strConn, name: "SQL Server", tags: new string[] {"BaseDB"})
+                .AddDbContextCheck<AppContext>();
+            services.AddHealthChecksUI();
+            
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(TrackPerformanceFilter));
             });
         }
 
@@ -48,19 +61,26 @@ namespace BaseCleanArchitecture.API
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("./swagger/v1/swagger.json", "BaseCleanArchitecture API's V1");
-                c.RoutePrefix = string.Empty;
-            });
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("./swagger/v1/swagger.json", "Base Clean Architecture API V1");
+                c.RoutePrefix = string.Empty;
+            });
+            
+            app.UseHealthChecks("/health", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseHealthChecksUI(config=> config.UIPath = "/health-ui");
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

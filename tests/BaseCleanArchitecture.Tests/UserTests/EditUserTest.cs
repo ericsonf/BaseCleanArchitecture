@@ -12,7 +12,7 @@ namespace BaseCleanArchitecture.Tests.UserTests
         public async Task UpdatesItemAfterAddingIt()
         {
             var repository = GetRepository();
-            var initialEmail = "test_email@email.com";
+            const string initialEmail = "test_email@email.com";
             var item = new User()
             {
                 Name = "Test Email",
@@ -27,7 +27,7 @@ namespace BaseCleanArchitecture.Tests.UserTests
                 .FirstOrDefault(i => i.Email == initialEmail);
             Assert.NotNull(newItem);
             Assert.NotSame(item, newItem);
-            var newEmail = "new_test_email@email.com";
+            const string newEmail = "new_test_email@email.com";
             newItem.Email = newEmail;
 
             await repository.UpdateAsync(newItem);

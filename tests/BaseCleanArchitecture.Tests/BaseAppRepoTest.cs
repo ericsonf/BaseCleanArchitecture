@@ -8,7 +8,7 @@ namespace BaseCleanArchitecture.Tests
     {
         protected AppContext _dbContext;
 
-        protected static DbContextOptions<AppContext> CreateNewContextOptions()
+        private static DbContextOptions<AppContext> CreateNewContextOptions()
         {
             var serviceProvider = new ServiceCollection()
                 .AddEntityFrameworkInMemoryDatabase()

@@ -4,13 +4,15 @@ using Xunit;
 
 namespace BaseCleanArchitecture.Tests.UserTests
 {
-    public class DeleteUsertest : BaseEfRepoTest
+    public class DeleteUserTest : BaseEfRepoTest
     {
         [Fact]
         public async Task DeleteUser()
         {
             var repository = GetRepository();
-            var initialName = "user_to_delete"; var item = new User()
+            const string initialName = "user_to_delete"; 
+            
+            var item = new User()
             {
                 Name = initialName,
                 Email = "test@email.com"
