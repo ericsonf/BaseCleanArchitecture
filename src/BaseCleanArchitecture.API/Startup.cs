@@ -1,6 +1,6 @@
 using BaseCleanArchitecture.API.Filters;
 using BaseCleanArchitecture.Core.Interfaces;
-using BaseCleanArchitecture.Infra.Log;
+using BaseCleanArchitecture.Infra.Logs;
 using BaseCleanArchitecture.Core.Shared.Interfaces;
 using BaseCleanArchitecture.Infra.Data;
 using BaseCleanArchitecture.UseCases;

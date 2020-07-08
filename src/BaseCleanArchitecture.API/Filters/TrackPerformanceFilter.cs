@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BaseCleanArchitecture.Infra.Log;
+using BaseCleanArchitecture.Infra.Logs;
 using BaseCleanArchitecture.Core.Shared.Interfaces;
 
 namespace BaseCleanArchitecture.API.Filters

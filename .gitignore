@@ -352,3 +352,12 @@ src/.DS_Store
 tests/.DS_Store
 src/BaseCleanArchitecture.API/.DS_Store
 .DS_Store
+
+# Rider cache/options directory
+.idea/
+
+# Visual Studio Code cache/options directory
+.vscode/
+
+#Serilog Logs
+src/BaseCleanArchitecture.API/logs.json
