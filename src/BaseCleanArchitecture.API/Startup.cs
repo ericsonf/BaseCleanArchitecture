@@ -8,9 +8,11 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
@@ -43,8 +45,10 @@ namespace BaseCleanArchitecture.API
             });
 
             services.AddHealthChecks()
-                .AddSqlServer(strConn, name: "SQL Server", tags: new string[] {"BaseDB"})
-                .AddDbContextCheck<AppContext>();
+                .AddSqlServer(strConn, name: "SQL Server", failureStatus: HealthStatus.Unhealthy,
+                    tags: new string[] {"Database Connection"})
+                .AddDbContextCheck<AppContext>(name:"DB Context", HealthStatus.Unhealthy,
+                    new string[] {"Database Connection"});
             services.AddHealthChecksUI();
             
             services.AddMvc(options =>
@@ -77,7 +81,14 @@ namespace BaseCleanArchitecture.API
             app.UseHealthChecks("/health", new HealthCheckOptions()
             {
                 Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                ResultStatusCodes =
+                {
+                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                    [HealthStatus.Degraded] = StatusCodes.Status500InternalServerError,
+                    [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                },
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+                AllowCachingResponses = false
             });
             app.UseHealthChecksUI(config=> config.UIPath = "/health-ui");
             

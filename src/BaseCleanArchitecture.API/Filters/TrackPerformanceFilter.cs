@@ -27,7 +27,8 @@ namespace BaseCleanArchitecture.API.Filters
             _timer.Stop();
             if (context.Exception == null)
             {
-                _logger.LogPerformance(context.HttpContext.Request.Method, context.HttpContext.Request.Path, _timer.ElapsedMilliseconds);
+                _logger.LogPerformance(context.HttpContext.Request.Method, context.HttpContext.Request.Path,
+                    _timer.ElapsedMilliseconds);
             }
 
             _userScope?.Dispose();
